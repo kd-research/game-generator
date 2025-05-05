@@ -1,13 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "game-generator"
 version = "0.1.0"
-description = "Add your description here"
+description = "Flask server for generating and customizing game assets."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "flask>=3.1.0",
+    "google-cloud-storage>=3.1.0",
     "techies",
 ]
 
+[project.urls]
+Homepage = "https://github.com/placeholder/game-generator" # Replace with your actual URL
+Issues = "https://github.com/placeholder/game-generator/issues" # Replace with your actual URL
+
 [tool.uv.sources]
 techies = { git = "https://github.com/kd-research/Techies" }
+
+[tool.setuptools]
+py-modules = []

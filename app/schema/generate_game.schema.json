@@ -17,23 +17,40 @@
         "required": ["request"]
       },
       
+      "FileObject": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the file."
+          },
+          "type": {
+            "type": "string",
+            "description": "The MIME type of the file (e.g., 'image/png', 'application/zip')."
+          },
+          "base64Data": {
+            "type": "string",
+            "format": "byte", 
+            "description": "Base64 encoded content of the file."
+          }
+        },
+        "required": ["name", "type", "base64Data"]
+      },
+      
       "GenerateGameResponse": {
         "type": "object",
         "properties": {
           "generated_icon": {
-            "type": "string",
-            "format": "binary",
-            "description": "Generated PNG image for the game icon"
+            "$ref": "#/definitions/FileObject",
+            "description": "Generated game icon file details."
           },
           "generated_splash": {
-            "type": "string",
-            "format": "binary",
-            "description": "Generated PNG image for the game splash screen"
+            "$ref": "#/definitions/FileObject",
+            "description": "Generated game splash screen file details."
           },
           "generated_bundle": {
-            "type": "string",
-            "format": "binary",
-            "description": "Generated ZIP file containing the game bundle"
+            "$ref": "#/definitions/FileObject",
+            "description": "Generated game bundle ZIP file details."
           },
           "status": {
             "type": "string",

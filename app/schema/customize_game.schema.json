@@ -27,26 +27,43 @@
             "description": "Text description of requested modifications"
           }
         },
-        "required": ["game_icon", "game_splash", "game_bundle", "request"]
+        "required": ["game_bundle", "request"]
       },
       
+      "FileObject": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the file."
+          },
+          "type": {
+            "type": "string",
+            "description": "The MIME type of the file (e.g., 'image/png', 'application/zip')."
+          },
+          "base64Data": {
+            "type": "string",
+            "format": "byte", 
+            "description": "Base64 encoded content of the file."
+          }
+        },
+        "required": ["name", "type", "base64Data"]
+      },
+
       "CustomizeGameResponse": {
         "type": "object",
         "properties": {
           "modified_icon": {
-            "type": "string",
-            "format": "binary",
-            "description": "Modified PNG image for the game icon"
+            "$ref": "#/definitions/FileObject",
+            "description": "Modified game icon file details."
           },
           "modified_splash": {
-            "type": "string",
-            "format": "binary",
-            "description": "Modified PNG image for the game splash screen"
+            "$ref": "#/definitions/FileObject",
+            "description": "Modified game splash screen file details."
           },
           "modified_bundle": {
-            "type": "string",
-            "format": "binary",
-            "description": "Modified ZIP file containing the game bundle"
+            "$ref": "#/definitions/FileObject",
+            "description": "Modified game bundle ZIP file details."
           },
           "status": {
             "type": "string",
