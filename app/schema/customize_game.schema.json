@@ -1,0 +1,125 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Game Customization API",
+    "description": "Schema for the customize_game API operation that modifies game assets",
+    
+    "definitions": {
+      "CustomizeGameRequest": {
+        "type": "object",
+        "properties": {
+          "game_icon": {
+            "type": "string",
+            "format": "binary",
+            "description": "PNG image file for the game icon"
+          },
+          "game_splash": {
+            "type": "string",
+            "format": "binary",
+            "description": "PNG image file for the game splash screen"
+          },
+          "game_bundle": {
+            "type": "string",
+            "format": "binary",
+            "description": "ZIP file containing the game bundle"
+          },
+          "request": {
+            "type": "string",
+            "description": "Text description of requested modifications"
+          }
+        },
+        "required": ["game_icon", "game_splash", "game_bundle", "request"]
+      },
+      
+      "CustomizeGameResponse": {
+        "type": "object",
+        "properties": {
+          "modified_icon": {
+            "type": "string",
+            "format": "binary",
+            "description": "Modified PNG image for the game icon"
+          },
+          "modified_splash": {
+            "type": "string",
+            "format": "binary",
+            "description": "Modified PNG image for the game splash screen"
+          },
+          "modified_bundle": {
+            "type": "string",
+            "format": "binary",
+            "description": "Modified ZIP file containing the game bundle"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["success", "partial_success", "failed"],
+            "description": "Status of the customization operation"
+          },
+          "message": {
+            "type": "string",
+            "description": "Additional information about the operation result"
+          }
+        },
+        "required": ["modified_icon", "modified_splash", "modified_bundle", "status"]
+      }
+    },
+    
+    "paths": {
+      "/v1/customize_game": {
+        "post": {
+          "summary": "Customize game assets",
+          "description": "Upload game icon, splash screen, and bundle with a modification request to receive customized versions",
+          "requestBody": {
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "$ref": "#/definitions/CustomizeGameRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/definitions/CustomizeGameResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid input (missing files or invalid format)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Server error during processing",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }

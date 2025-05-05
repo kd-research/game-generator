@@ -1,0 +1,136 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Game Generation API",
+    "description": "Schema for the generate_game API operation that creates game assets from a request message",
+    
+    "definitions": {
+      "GenerateGameRequest": {
+        "type": "object",
+        "properties": {
+          "request": {
+            "type": "string",
+            "description": "Text description of the game to generate",
+            "minLength": 1,
+            "examples": ["Create a sci-fi space exploration game with neon elements"]
+          }
+        },
+        "required": ["request"]
+      },
+      
+      "GenerateGameResponse": {
+        "type": "object",
+        "properties": {
+          "generated_icon": {
+            "type": "string",
+            "format": "binary",
+            "description": "Generated PNG image for the game icon"
+          },
+          "generated_splash": {
+            "type": "string",
+            "format": "binary",
+            "description": "Generated PNG image for the game splash screen"
+          },
+          "generated_bundle": {
+            "type": "string",
+            "format": "binary",
+            "description": "Generated ZIP file containing the game bundle"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["success", "partial_success", "failed"],
+            "description": "Status of the generation operation"
+          },
+          "message": {
+            "type": "string",
+            "description": "Additional information about the operation result"
+          },
+          "generation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for this generation request"
+          }
+        },
+        "required": ["generated_icon", "generated_splash", "generated_bundle", "status", "generation_id"]
+      }
+    },
+    
+    "paths": {
+      "/v1/generate_game": {
+        "post": {
+          "summary": "Generate game assets",
+          "description": "Generate game icon, splash screen, and bundle based on a text description",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/GenerateGameRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/definitions/GenerateGameResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid input (missing or empty request)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "Too many requests - rate limit exceeded",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      },
+                      "retry_after": {
+                        "type": "integer",
+                        "description": "Time in seconds to wait before retrying"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Server error during processing",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }

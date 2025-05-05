@@ -1,0 +1,13 @@
+[project]
+name = "game-generator"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "flask>=3.1.0",
+    "techies",
+]
+
+[tool.uv.sources]
+techies = { git = "https://github.com/kd-research/Techies" }
