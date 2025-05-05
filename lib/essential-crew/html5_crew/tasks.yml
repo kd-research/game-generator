@@ -1,0 +1,20 @@
+_task_common: &task_common
+  human_input: false
+  async_execution: false
+
+html5_game_coding:
+  <<: *task_common
+  agent: html5_game_architect
+  description: >
+    1. **Specification Analysis:** Read `game_hierarchy.xml` and existing `game.html`.  
+    2. **Subtask Delegation:** Assign detailed, example-rich instructions to each specialist agent.  
+    3. **Incremental Integration & Testing:** After each agent’s work, validate the integration, then hand off to `html5_game_tester`.  
+    4. **Error Handling:** If any subtask fails, immediately output the graceful failure HTML (see architect’s failure example) and halt.  
+    5. **Final Assembly:** Once tester confirms “Game is complete and playable,” consolidate all embedded CSS/JS into one `game.html`.  
+  expected_output: >
+    Upon tester approval, output in plain text:
+    ```
+    I have successfully developed the game saved in "game.html", as described per the game specification and game_hierarchy.xml file.
+    ```
+
+# vim: set foldmethod=indent foldlevel=0:
