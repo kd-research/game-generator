@@ -14,4 +14,4 @@ def get_crew(crew_name:str, workspace_path:str):
 
     agent_pool = Agent.eager_load_all(tools)
     task_pool = Task.eager_load_all(agent_pool)
-    return Crew(crew_name, agent_pool=agent_pool, task_pool=task_pool)
+    return Crew(crew_name, agent_pool=agent_pool, task_pool=task_pool, introduce_only=False)
