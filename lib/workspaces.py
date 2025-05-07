@@ -6,6 +6,53 @@ import base64
 from typing import Dict, Optional
 from werkzeug.datastructures import FileStorage
 
+def _extract_and_prepare_game_content(bundle_zip_path: str, target_workspace_dir: str) -> None:
+    """
+    Extracts game content from a zip bundle, finds the root based on index.html,
+    and moves the content to the target workspace directory.
+    """
+    extraction_tempdir = tempfile.mkdtemp()
+    print(f"Created temporary directory for bundle extraction: {extraction_tempdir}")
+    try:
+        try:
+            with zipfile.ZipFile(bundle_zip_path, 'r') as zip_ref:
+                zip_ref.extractall(extraction_tempdir)
+            print(f"Bundle temporarily extracted from {bundle_zip_path} to: {extraction_tempdir}")
+        except zipfile.BadZipFile:
+            # This error will be caught by the caller (prepare_workspace)
+            print(f"Error: Bundle at {bundle_zip_path} is not a valid zip file.")
+            raise ValueError("Invalid game bundle format: Not a valid zip file.")
+
+        index_html_path = None
+        for root, _, files in os.walk(extraction_tempdir):
+            if "index.html" in files:
+                index_html_path = os.path.join(root, "index.html")
+                break
+
+        if not index_html_path:
+            # This error will be caught by the caller (prepare_workspace)
+            raise ValueError("Game bundle does not contain an 'index.html' file.")
+
+        content_root_dir = os.path.dirname(index_html_path)
+        print(f"Identified game content root: {content_root_dir}")
+
+        # Move items from content_root_dir to target_workspace_dir
+        for item_name in os.listdir(content_root_dir):
+            source_item_path = os.path.join(content_root_dir, item_name)
+            # shutil.move(src, dst_dir) moves src into dst_dir.
+            # If an item with the same name exists in dst_dir,
+            # behavior depends on whether it's a file or directory.
+            # Files will be overwritten. Directories will have src moved inside them if names clash.
+            # Given target_workspace_dir might contain 'external', this behavior is acceptable.
+            shutil.move(source_item_path, target_workspace_dir)
+        
+        print(f"Moved game content from {content_root_dir} to {target_workspace_dir}")
+
+    finally:
+        if os.path.exists(extraction_tempdir):
+            shutil.rmtree(extraction_tempdir)
+            print(f"Cleaned up temporary extraction directory: {extraction_tempdir}")
+
 def initialize_workspace() -> str:
     """Creates a temporary directory for processing.
 
@@ -41,15 +88,15 @@ def prepare_workspace(
     bundle_zip_path = os.path.join(tempdir, "_bundle.zip")
     game_bundle.save(bundle_zip_path)
     try:
-        with zipfile.ZipFile(bundle_zip_path, 'r') as zip_ref:
-            zip_ref.extractall(tempdir)
-        print(f"Unzipped game bundle into: {tempdir}")
-    except zipfile.BadZipFile:
-        print(f"Error: Uploaded bundle is not a valid zip file: {game_bundle.filename}")
-        # Consider raising an exception here for the route to handle
-        raise ValueError("Invalid game bundle format.")
+        _extract_and_prepare_game_content(bundle_zip_path, tempdir)
+        print(f"Successfully processed and placed game content into: {tempdir}")
+    except ValueError as e: # Catches ValueErrors from _extract_and_prepare_game_content
+        print(f"Error processing game bundle: {e}")
+        # Re-raise the exception for the calling route to handle and return a proper response
+        raise
     finally:
-        os.remove(bundle_zip_path) # Clean up the temporary zip file
+        if os.path.exists(bundle_zip_path): # Ensure it exists before removing
+            os.remove(bundle_zip_path) # Clean up the temporary zip file
 
     # Copy icon if provided
     if game_icon:

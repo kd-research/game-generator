@@ -9,7 +9,7 @@ def get_crew(crew_name:str, workspace_path:str):
     os.environ["TECHIES_RUNTIME"] = os.path.dirname(__file__) + "/essential-crew"
 
     tools = get_all_tools()
-    for tool in tools:
+    for tool in tools.values():
         tool.base_dir = workspace_path
 
     agent_pool = Agent.eager_load_all(tools)
