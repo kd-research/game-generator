@@ -73,9 +73,13 @@
           "message": {
             "type": "string",
             "description": "Additional information about the operation result"
+          },
+          "suggested_name": {
+            "type": "string",
+            "description": "Suggested name for the modified game"
           }
         },
-        "required": ["modified_icon", "modified_splash", "modified_bundle", "status"]
+        "required": ["modified_icon", "modified_splash", "modified_bundle", "status", "message", "suggested_name"]
       }
     },
     

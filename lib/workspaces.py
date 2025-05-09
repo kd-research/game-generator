@@ -3,6 +3,7 @@ import os
 import shutil
 import zipfile
 import base64
+import json
 from typing import Dict, Optional
 from werkzeug.datastructures import FileStorage
 
@@ -127,9 +128,11 @@ def finalize_workspace(tempdir: str) -> Dict[str, Optional[str]]:
         "bundle_base64Data": None,
         "status": "FAILURE", # Default to failure
         "message": "Processing script did not produce a result file.", # Default message
+        "suggested_name": None, # Default suggested name
     }
     external_path = os.path.join(tempdir, "external")
     result_file_path = os.path.join(external_path, "result")
+    metadata_file_path = os.path.join(external_path, "metadata.json")
 
     def read_and_encode(file_path: str) -> Optional[str]:
         if not os.path.exists(file_path):
@@ -171,6 +174,19 @@ def finalize_workspace(tempdir: str) -> Dict[str, Optional[str]]:
             message = f"Error reading result file {file_path}: {e}"
             print(message)
         return {"status": status, "message": message}
+    
+    def parse_metadata_file(file_path: str) -> Dict[str, Optional[str]]:
+        metadata = {}
+        if not os.path.exists(file_path):
+            print(f"Metadata file not found: {file_path}")
+            return metadata
+        try:
+            with open(file_path, "r", encoding='utf-8') as f:
+                metadata = json.load(f)
+                print(f"Loaded metadata from {file_path}")
+        except Exception as e:
+            print(f"Error reading metadata file {file_path}: {e}")
+        return metadata
 
     # Load external assets if they exist
     if os.path.exists(external_path):
@@ -181,6 +197,10 @@ def finalize_workspace(tempdir: str) -> Dict[str, Optional[str]]:
         parsed_result = parse_result_file(result_file_path)
         results["status"] = parsed_result["status"]
         results["message"] = parsed_result["message"]
+        
+        # Parse the metadata file and merge with results
+        metadata = parse_metadata_file(metadata_file_path)
+        results.update(metadata)
         
         # Remove the external folder before zipping the main content
         shutil.rmtree(external_path)

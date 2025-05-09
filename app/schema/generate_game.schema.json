@@ -65,9 +65,13 @@
             "type": "string",
             "format": "uuid",
             "description": "Unique identifier for this generation request"
+          },
+          "suggested_name": {
+            "type": "string",
+            "description": "Suggested name for the generated game"
           }
         },
-        "required": ["generated_icon", "generated_splash", "generated_bundle", "status", "generation_id"]
+        "required": ["generated_icon", "generated_splash", "generated_bundle", "status", "message", "generation_id", "suggested_name"]
       }
     },
     

@@ -49,7 +49,8 @@ def generate_game():
             },
             "status": final_results["status"].lower() if final_results["status"] else "failed",
             "message": final_results["message"],
-            "generation_id": str(uuid.uuid4()) 
+            "generation_id": str(uuid.uuid4()),
+            "suggested_name": final_results["suggested_name"]
         }
 
         # Ensure required fields have data, even if empty, to match schema
@@ -62,6 +63,8 @@ def generate_game():
              if response_data["status"] == "success": # Bundle is required for success
                  response_data["status"] = "failed"
                  response_data["message"] = "Failed to generate game bundle zip."
+        if "suggested_name" not in final_results or not final_results["suggested_name"]:
+             response_data["suggested_name"] = ""
 
         return jsonify(response_data)
 
